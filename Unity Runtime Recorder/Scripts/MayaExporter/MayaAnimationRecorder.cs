@@ -16,8 +16,8 @@ public class MayaAnimationRecorder : MonoBehaviour {
 	public string originalMaFilePath;
 
 	// control keys
-	public KeyCode startKey;
-	public KeyCode endKey;
+	public KeyCode startKey = KeyCode.Q;
+	public KeyCode endKey = KeyCode.W;
 
 	// other settings
 	public bool changeTimeScale = false;

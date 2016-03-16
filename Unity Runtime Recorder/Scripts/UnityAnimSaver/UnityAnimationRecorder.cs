@@ -8,8 +8,8 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	public string savePath;
 	public string fileName;
 
-	public KeyCode startRecordKey;
-	public KeyCode stopRecordKey;
+	public KeyCode startRecordKey = KeyCode.Q;
+	public KeyCode stopRecordKey = KeyCode.W;
 
 	// options
 	public bool showLogGUI = false;
