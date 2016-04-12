@@ -47,16 +47,11 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	void Update () {
 	
 		if (Input.GetKeyDown (startRecordKey)) {
-			CustomDebug ("Start Recorder");
-			isStart = true;
-			Time.timeScale = timeScaleOnRecord;
+			StartRecording ();
 		}
 
 		if (Input.GetKeyDown (stopRecordKey)) {
-			CustomDebug ("End Record, generating .anim file");
-			isStart = false;
-
-			ExportAnimationClip ();
+			StopRecording ();
 		}
 
 		if (isStart) {
@@ -68,6 +63,23 @@ public class UnityAnimationRecorder : MonoBehaviour {
 		}
 
 	}
+
+	public void StartRecording () {
+		CustomDebug ("Start Recorder");
+		isStart = true;
+		Time.timeScale = timeScaleOnRecord;
+	}
+
+
+	public void StopRecording () {
+		CustomDebug ("End Record, generating .anim file");
+		isStart = false;
+
+		ExportAnimationClip ();
+	}
+
+
+
 
 	void FixedUpdate () {
 

@@ -71,18 +71,11 @@ public class MayaAnimationRecorder : MonoBehaviour {
 	void Update () {
 
 		if (Input.GetKeyDown (startKey)) {
-			ShowLog ("Recording start");
-
-			if (changeTimeScale)
-				Time.timeScale = startRecordWithTimeScale;
-
-			isStart = true;
+			StartRecording ();
 		}
 
 		if (Input.GetKeyDown (endKey)) {
-			ShowLog( "End recording, wait for file process ... " );
-			isEnd = true;
-			StartCoroutine( "EndRecord" );
+			StopRecording ();
 		}
 	}
 
@@ -90,6 +83,24 @@ public class MayaAnimationRecorder : MonoBehaviour {
 		if (showLogGUI)
 			GUILayout.Label (logMessage);
 	}
+
+
+	public void StartRecording () {
+		ShowLog ("Recording start");
+
+		if (changeTimeScale)
+			Time.timeScale = startRecordWithTimeScale;
+
+		isStart = true;
+	}
+
+
+	public void StopRecording () {
+		ShowLog( "End recording, wait for file process ... " );
+		isEnd = true;
+		StartCoroutine( "EndRecord" );
+	}
+
 
 	// Update is called once per frame
 	void FixedUpdate () {
