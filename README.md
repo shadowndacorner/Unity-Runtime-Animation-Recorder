@@ -19,6 +19,7 @@
   [https://youtu.be/RAjU5KodE1w](https://youtu.be/RAjU5KodE1w)
 
 #### Unity Anim Saver
+※ this function needs UnityEditor to work, so can only work in the Editor.
 
   1. Drag the UnityAnimationRecorder.cs script on any GameObject, and it will record all transforms in children.  
   2. Press "Set Save Path" button in the inspector, choose pick a folder and enter file name.
