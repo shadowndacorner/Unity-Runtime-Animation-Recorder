@@ -46,15 +46,12 @@ public class UnityAnimationRecorderEditor : Editor {
 		EditorGUILayout.LabelField ("== Path Settings ==");
 
 		if (GUILayout.Button ("Set Save Path")) {
-			string defaultName = serializedObject.targetObject.name + "-Animation.anim";
-			string targetPath = EditorUtility.SaveFilePanelInProject ("Save Anim File To ..", defaultName, "anim", "please select a folder and enter the file name");
+			string defaultName = serializedObject.targetObject.name + "-Animation";
+			string targetPath = EditorUtility.SaveFilePanelInProject ("Save Anim File To ..", defaultName, "", "please select a folder and enter the file name");
 
 			int lastIndex = targetPath.LastIndexOf ("/");
 			savePath.stringValue = targetPath.Substring (0, lastIndex + 1);
 			string toFileName = targetPath.Substring (lastIndex + 1);
-
-			if (toFileName.IndexOf (".anim") < 0)
-				toFileName += ".anim";
 
 			fileName.stringValue = toFileName;
 		}

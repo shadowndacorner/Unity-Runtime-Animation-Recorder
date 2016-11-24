@@ -9,6 +9,9 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	public string savePath;
 	public string fileName;
 
+	// use it when save multiple files
+	int fileIndex = 0;
+
 	public KeyCode startRecordKey = KeyCode.Q;
 	public KeyCode stopRecordKey = KeyCode.W;
 
@@ -32,8 +35,16 @@ public class UnityAnimationRecorder : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		SetupRecorders ();
+
+	}
+
+	void SetupRecorders () {
 		recordObjs = gameObject.GetComponentsInChildren<Transform> ();
 		objRecorders = new UnityObjectAnimation[recordObjs.Length];
+
+		frameIndex = 0;
+		nowTime = 0.0f;
 
 		for (int i = 0; i < recordObjs.Length; i++) {
 			string path = AnimationRecorderHelper.GetTransformPathName (transform, recordObjs [i]);
@@ -77,9 +88,12 @@ public class UnityAnimationRecorder : MonoBehaviour {
 		isStart = false;
 
 		ExportAnimationClip ();
+		ResetRecorder ();
 	}
 
-
+	void ResetRecorder () {
+		SetupRecorders ();
+	}
 
 
 	void FixedUpdate () {
@@ -109,6 +123,13 @@ public class UnityAnimationRecorder : MonoBehaviour {
 
 		string exportFilePath = savePath + fileName;
 
+		// if record multiple files when run
+		if (fileIndex != 0)
+			exportFilePath += "-" + fileIndex + ".anim";
+		else
+			exportFilePath += ".anim";
+
+
 		AnimationClip clip = new AnimationClip ();
 		clip.name = fileName;
 
@@ -124,6 +145,7 @@ public class UnityAnimationRecorder : MonoBehaviour {
 		AssetDatabase.CreateAsset ( clip, exportFilePath );
 
 		CustomDebug (".anim file generated to " + exportFilePath);
+		fileIndex++;
 	}
 
 	void CustomDebug ( string message ) {
