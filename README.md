@@ -3,10 +3,6 @@
   This project can make you recording animations in runtime with Unity, and can save into .anim or Maya .ma format.  
   Though Maya has its own physic simulator, but unity is much faster and can easily control detail movement through scripts.  
     
-  This idea first came from Taiwanese artist [Hsin-Chien Huang](http://www.storynest.com/)  
-  These script were used to help the process of a concert video, simulating some ragdoll falling animation.
-    
-    
 ## Installation
   
   Copy just copy Unity Runtime Recorder folder into your Asset folder and it's ready to go.  
