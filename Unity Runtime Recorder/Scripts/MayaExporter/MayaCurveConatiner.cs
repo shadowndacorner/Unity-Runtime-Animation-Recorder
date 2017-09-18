@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class MayaCurveConatiner {
 
 	public string objName = "";
+	public string fileName = "";
 	public string curveName = "";
 	public string propertyName = "";
 	public string footPropertyName = "";
@@ -21,6 +22,7 @@ public class MayaCurveConatiner {
 		// init the vars
 		inputPath = filePath;
 		objName = inputObjName;
+		fileName = objName.Replace ('/', '-');
 		curveName = inputCurveName;
 		propertyName = inputPropertyName;
 		footPropertyName = inputFootName;
@@ -29,7 +31,7 @@ public class MayaCurveConatiner {
 	}
 
 	string compressFileName () {
-		return objName + "_" + propertyName;
+		return fileName + "_" + propertyName;
 	}
 
 	public void AddValue ( int frameIndex, float inputValue ) {

@@ -24,6 +24,9 @@ public class MayaAnimationRecorder : MonoBehaviour {
 	public float startGameWithTimeScale = 0.0f;
 	public float startRecordWithTimeScale = 1.0f;
 
+	// save path name or not
+	public bool includePathName = false;
+
 	public bool showLogGUI = false;
 	string logMessage = "";
 
@@ -61,7 +64,14 @@ public class MayaAnimationRecorder : MonoBehaviour {
 		objNums = objAnims.Length;
 
 		for (int i=0; i< observeObjs.Length; i++) {
-			string namePath = AnimationRecorderHelper.GetTransformPathName (transform, observeObjs [i]);
+
+			string namePath = observeObjs [i].name;
+
+			// if there are some nodes with same names, include path
+			if (includePathName) {
+				namePath = AnimationRecorderHelper.GetTransformPathName (transform, observeObjs [i]);
+				Debug.Log ("get name: " + namePath);
+			}
 			objAnims[i] = new ObjAnimationContainer( observeObjs[i], namePath, saveFolderPath, true, true, true );
 		}
 

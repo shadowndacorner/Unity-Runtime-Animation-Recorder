@@ -21,6 +21,8 @@ public class MayaAnimationRecorderEditor : Editor {
 	SerializedProperty recordLimitFrames;
 	SerializedProperty recordFrames;
 
+	SerializedProperty includePathName;
+
 	void OnEnable () {
 
 		saveFileName = serializedObject.FindProperty ("saveFileName");
@@ -39,6 +41,7 @@ public class MayaAnimationRecorderEditor : Editor {
 		recordLimitFrames = serializedObject.FindProperty ("recordLimitFrames");
 		recordFrames = serializedObject.FindProperty ("recordFrames");
 
+		includePathName = serializedObject.FindProperty ("includePathName");
 	}
 
 	public override void OnInspectorGUI () {
@@ -91,6 +94,7 @@ public class MayaAnimationRecorderEditor : Editor {
 		if (recordLimitFrames.boolValue)
 			EditorGUILayout.PropertyField (recordFrames);
 
+		includePathName.boolValue = EditorGUILayout.Toggle ("Include Path Name", includePathName.boolValue);
 		serializedObject.ApplyModifiedProperties ();
 
 		//DrawDefaultInspector ();

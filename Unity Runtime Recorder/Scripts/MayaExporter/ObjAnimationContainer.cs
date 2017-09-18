@@ -6,6 +6,7 @@ public class ObjAnimationContainer {
 
 	public Transform observeObj;
 	string objName;
+	string fileName;
 	string filePath;
 
 	public bool recordTranslation = false;
@@ -24,6 +25,7 @@ public class ObjAnimationContainer {
 	public ObjAnimationContainer ( Transform inputObj, string namePath, string inputPath, bool recordT, bool recordR, bool recordS ) {
 		
 		objName = namePath;
+		fileName = objName.Replace ('/', '-');
 		observeObj = inputObj;
 		filePath = inputPath;
 
@@ -129,7 +131,7 @@ public class ObjAnimationContainer {
 
 	// combine all curves' data file into one objectDataFile
 	public void combineCurveFiles () {
-		objFinalFilePath = filePath + "/" + objName + "_objectAll";
+		objFinalFilePath = filePath + "/" + fileName + "_objectAll";
 
 		StreamWriter finalWriter = new StreamWriter (objFinalFilePath);
 
