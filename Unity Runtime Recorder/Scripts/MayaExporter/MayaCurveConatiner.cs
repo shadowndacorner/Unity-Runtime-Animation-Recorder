@@ -36,7 +36,7 @@ public class MayaCurveConatiner {
 
 	public void AddValue ( int frameIndex, float inputValue ) {
 
-		string addContent = " " + frameIndex + " " + inputValue;
+		string addContent = " " + frameIndex + " " + inputValue.ToString("###0.0###");
 		storedData += addContent;
 
 		animCount++;
