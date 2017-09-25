@@ -14,7 +14,7 @@
   Here is a short video demo.  
   [https://youtu.be/RAjU5KodE1w](https://youtu.be/RAjU5KodE1w)
 
-#### Unity Anim Saver
+## Unity Anim Saver
 ※ this function needs UnityEditor to work, so can only work in the Editor.
 
   1. Drag the UnityAnimationRecorder.cs script on any GameObject, and it will record all transforms in children.  
@@ -22,14 +22,24 @@
   3. Play the scene, and start/end recording by press the key you set in the inspector.
   4. When End Recording pressed, the .anim file will be generated.
   
-#### Maya Exporter
+## Maya Exporter
 
   Pretty much the same as Unity Anim Saver.  
   Additionally, you have to select an .ma file which contains all model information.  
   
   My script doesn't generate model informations for maya, it only record animation data and append them at the end of .ma file.
-  If you want to export the meshes you make in Unity, you can use [Export2Maya](https://www.assetstore.unity3d.com/en/#!/content/17079) which I also use in the concert project.
+  If you want to export the meshes you make in Unity, you can try [Export2Maya](https://www.assetstore.unity3d.com/en/#!/content/17079) which is a nice plugin I use before.
   
+### Export Humanoid Animations to Maya
+
+  Unity and Maya treat spines differently, which sometimes cause issues when you exporting animation with SkinnedMesh.
+    
+  In Maya, there is an additional "Joint Orient". The actual spine rotation is the sum of transform rotation and joint orient. But since Unity doesn't have this attribute, the transform rotation values in Unity is alreay the sum value. While this plugin is recording the values in Unity, the joint orient values will add once more in Maya, cause the recorded result weird.  
+  
+  In order to record animation correct, we have to make every spines' "joint orient" values to (0,0,0). And here is a tutorial video if you not sure how to do it.
+    
+  [Export Humanoid Animation from Unity to Maya - Unity Runtime Animation Recorder](https://youtu.be/Ooxg-rFPTcM)
+
 ## Dealing with Lag
 
   If you want to simulate with a big amount of objects, you might ecountered lag.  
