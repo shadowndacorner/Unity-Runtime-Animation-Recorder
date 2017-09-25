@@ -172,14 +172,29 @@ public class MayaAnimationRecorder : MonoBehaviour {
 
 		// duplicate originalMaFile
 		string newFilePath = saveFolderPath + saveFileName;
+
+		/* 2017-09-26
+		 * 
+		 * set all spines' Joint Orient to (0,0,0)
+		 * this can prevent SkinnedMesh animation export fail
+		 */
+		ShowLog ("Adjusting Spine Joint Orient Values ...");
+
+		string maFileData = File.ReadAllText (originalMaFilePath);
+		maFileData = System.Text.RegularExpressions.Regex.Replace (
+			maFileData, 
+			"\".jo\" -type \"double3\" [^ ]* [^ ]* [^ ]*", 
+			"\".jo\" -type \"double3\" 0 0 0"
+		);
+
+
+		// Combine ma file with animation data
+		ShowLog ("Combining File into one ...");
+
 		StreamWriter writer = new StreamWriter ( newFilePath );
 
-		// read from original ma file
-		StreamReader maReader = new StreamReader ( originalMaFilePath );
-		writer.Write (maReader.ReadToEnd ());
-		maReader.Close ();
-
-		ShowLog ("Combining File into one ...");
+		// write ma file
+		writer.Write (maFileData);
 
 		// copy all file content into one single ma file
 		for( int i=0; i< objAnims.Length; i++ )

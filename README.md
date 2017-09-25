@@ -32,13 +32,16 @@
   
 ### Export Humanoid Animations to Maya
 
+  ※ This step is no longer needed, the script will solve this problem automatically. But since this section explains the problem and the solution, so not remove it.
+
   Unity and Maya treat spines differently, which sometimes cause issues when you exporting animation with SkinnedMesh.
     
   In Maya, there is an additional "Joint Orient". The actual spine rotation is the sum of transform rotation and joint orient. But since Unity doesn't have this attribute, the transform rotation values in Unity is alreay the sum value. While this plugin is recording the values in Unity, the joint orient values will add once more in Maya, cause the recorded result weird.  
   
   In order to record animation correct, we have to make every spines' "joint orient" values to (0,0,0). And here is a tutorial video if you not sure how to do it.
     
-  [Export Humanoid Animation from Unity to Maya - Unity Runtime Animation Recorder](https://youtu.be/Ooxg-rFPTcM)
+  [Export Humanoid Animation from Unity to Maya - Unity Runtime Animation Recorder](https://youtu.be/Ooxg-rFPTcM)  
+  ※ Now the Maya Exporter script will set all spines' joint orient to (0,0,0), which solves this problem automatically.
 
 ## Dealing with Lag
 
