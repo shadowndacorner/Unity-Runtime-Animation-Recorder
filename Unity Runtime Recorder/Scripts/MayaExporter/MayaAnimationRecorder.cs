@@ -24,6 +24,11 @@ public class MayaAnimationRecorder : MonoBehaviour {
 	public float startGameWithTimeScale = 0.0f;
 	public float startRecordWithTimeScale = 1.0f;
 
+	// data record settings
+	public bool recordPosition = true;
+	public bool recordRotation = true;
+	public bool recordScale = true;
+
 	// save path name or not
 	public bool includePathName = false;
 
@@ -72,7 +77,7 @@ public class MayaAnimationRecorder : MonoBehaviour {
 				namePath = AnimationRecorderHelper.GetTransformPathName (transform, observeObjs [i]);
 				Debug.Log ("get name: " + namePath);
 			}
-			objAnims[i] = new ObjAnimationContainer( observeObjs[i], namePath, saveFolderPath, true, true, true );
+			objAnims[i] = new ObjAnimationContainer( observeObjs[i], namePath, saveFolderPath, recordPosition, recordRotation, recordScale );
 		}
 
 		ShowLog ("Setting complete");

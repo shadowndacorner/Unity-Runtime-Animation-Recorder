@@ -18,6 +18,11 @@ public class MayaAnimationRecorderEditor : Editor {
 
 	SerializedProperty showDebugGUI;
 
+	SerializedProperty recordPosition;
+	SerializedProperty recordRotation;
+	SerializedProperty recordScale;
+
+
 	SerializedProperty recordLimitFrames;
 	SerializedProperty recordFrames;
 
@@ -37,6 +42,11 @@ public class MayaAnimationRecorderEditor : Editor {
 		startRecordWithTimeScale = serializedObject.FindProperty ("startRecordWithTimeScale");
 
 		showDebugGUI = serializedObject.FindProperty ("showLogGUI");
+
+		recordPosition = serializedObject.FindProperty ("recordPosition");
+		recordRotation = serializedObject.FindProperty ("recordRotation");
+		recordScale = serializedObject.FindProperty ("recordScale");
+
 
 		recordLimitFrames = serializedObject.FindProperty ("recordLimitFrames");
 		recordFrames = serializedObject.FindProperty ("recordFrames");
@@ -67,6 +77,15 @@ public class MayaAnimationRecorderEditor : Editor {
 		EditorGUILayout.PropertyField (saveFileName);
 
 		EditorGUILayout.Space ();
+
+		// record setting
+		EditorGUILayout.LabelField( "== Record Setting ==" );
+		recordPosition.boolValue = EditorGUILayout.Toggle ("Record Position", recordPosition.boolValue);
+		recordRotation.boolValue = EditorGUILayout.Toggle ("Record Position", recordRotation.boolValue);
+		recordScale.boolValue = EditorGUILayout.Toggle ("Record Position", recordScale.boolValue);
+
+		EditorGUILayout.Space ();
+
 
 		// keys setting
 		EditorGUILayout.LabelField( "== Control Keys ==" );
