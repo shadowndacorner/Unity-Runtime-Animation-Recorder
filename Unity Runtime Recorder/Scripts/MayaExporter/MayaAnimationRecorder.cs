@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class MayaAnimationRecorder : MonoBehaviour {
 
 	Transform[] observeObjs;
-	ObjAnimationContainer[] objAnims;
+	MayaNodeDataContainer[] objAnims;
 
 	// the folder path
 	public string saveFolderPath;
@@ -64,7 +64,7 @@ public class MayaAnimationRecorder : MonoBehaviour {
 
 		// get all record objs
 		observeObjs = gameObject.GetComponentsInChildren<Transform> ();
-		objAnims = new ObjAnimationContainer[ observeObjs.Length ];
+		objAnims = new MayaNodeDataContainer[ observeObjs.Length ];
 
 		objNums = objAnims.Length;
 
@@ -77,7 +77,7 @@ public class MayaAnimationRecorder : MonoBehaviour {
 				namePath = AnimationRecorderHelper.GetTransformPathName (transform, observeObjs [i]);
 				Debug.Log ("get name: " + namePath);
 			}
-			objAnims[i] = new ObjAnimationContainer( observeObjs[i], namePath, saveFolderPath, recordPosition, recordRotation, recordScale );
+			objAnims[i] = new MayaNodeDataContainer( observeObjs[i], namePath, saveFolderPath, recordPosition, recordRotation, recordScale );
 		}
 
 		ShowLog ("Setting complete");
@@ -157,19 +157,18 @@ public class MayaAnimationRecorder : MonoBehaviour {
 
 	IEnumerator EndRecord () {
 
-		ShowLog ("Terminating Anim Recorders ...");
-		// finish recording
-		for (int i=0; i< objAnims.Length; i++)
-		{
-			objAnims [i].EndRecord ();
+		ShowLog ("Writing Anim Data into Files ...");
 
-			if( i % processPerFrame == 0 )
-				yield return 0;
+		for (int i = 0; i < objAnims.Length; i++) {
+			objAnims [i].WriteIntoFile ();
+
+			// prevent lag
+			if (i % 10 == 0)
+				yield return null;
 		}
-
+		
 		// save into ma file
 		StartCoroutine ("exportToMayaAnimation");
-
 	}
 
 
@@ -182,6 +181,7 @@ public class MayaAnimationRecorder : MonoBehaviour {
 		 * 
 		 * set all spines' Joint Orient to (0,0,0)
 		 * this can prevent SkinnedMesh animation export fail
+		 * 
 		 */
 		ShowLog ("Adjusting Spine Joint Orient Values ...");
 
