@@ -43,6 +43,12 @@
   [Export Humanoid Animation from Unity to Maya - Unity Runtime Animation Recorder](https://youtu.be/Ooxg-rFPTcM)  
   ※ Now the Maya Exporter script will set all spines' joint orient to (0,0,0), which solves this problem automatically.
 
+## FBX Exporter
+  
+  2017-10-10 Implemented FBX exporter, works similar as Maya Exporter.  
+  But for now, there is some memory issue, can't export too complex objects.  
+    
+
 ## Dealing with Lag
 
   If you want to simulate with a big amount of objects, you might ecountered lag.  
