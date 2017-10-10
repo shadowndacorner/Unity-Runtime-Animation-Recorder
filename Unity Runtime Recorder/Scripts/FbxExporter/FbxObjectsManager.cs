@@ -4,28 +4,31 @@ using UnityEngine;
 using System.IO;
 using System.Text.RegularExpressions;
 
-public class FbxObjectsManager {
+public class FbxObjectsManager
+{
 
-	List<FbxObjectNode> objNodes;
+	public FbxDataNode objMainNode;
+	string saveFileFolder;
 
-	public FbxObjectsManager () {
-		objNodes = new List<FbxObjectNode> ();
+	public FbxObjectsManager (FbxDataNode inputObjNode, string folder)
+	{
+		objMainNode = inputObjNode;
+		saveFileFolder = folder;
 	}
 
 	// insert new objs into file
-	public void EditTargetFile (string targetFilePath) {
-
+	public void EditTargetFile (string targetFilePath)
+	{
 		string sourceData = File.ReadAllText (targetFilePath);
 		string newData = "";
 
 		// find start of the Objects
 		int startIndex = sourceData.IndexOf ("Objects:  {\n");
-		startIndex += ("Objects:  {\n").Length;
-
 		// copy data into new
-		newData = sourceData.Substring(0, startIndex);
+		newData = sourceData.Substring (0, startIndex);
 
 
+		startIndex += ("Objects:  {\n").Length;
 
 		StringReader reader = new StringReader (sourceData);
 
@@ -51,77 +54,98 @@ public class FbxObjectsManager {
 			}
 		}
 
-		// write other data in new
-		newData += sourceData.Substring(startIndex, readCounter-1);
-
 		// write custom datas
-		for (int i = 0; i < objNodes.Count; i++)
-			newData += objNodes [i].GetResultString ();
-
+		newData += objMainNode.getResultData();
 
 		// end the file
-		newData += sourceData.Substring(startIndex + readCounter-1);
+		newData += sourceData.Substring (startIndex + readCounter);
 
 		File.WriteAllText (targetFilePath, newData);
 	}
 
-	public void AddObject (string nodeType, string nodeId, string nodeName, string subType) {
-		FbxObjectNode obj = new FbxObjectNode (nodeType, nodeId, nodeName, subType);
-	}
-
-	public void AddAnimationCurveNode (string inputId, FbxAnimationCurveNodeType animCurveType, Vector3 initData ) {
-		string nodeName = "";
+	public void AddAnimationCurveNode (string inputId, FbxAnimationCurveNodeType animCurveType, Vector3 initData)
+	{
+		string nodeName = "AnimationCurveNode";
+		string curveTypeStr = "";
 
 		if (animCurveType == FbxAnimationCurveNodeType.Translation)
-			nodeName = "AnimCurveNode::T";
-		else if( animCurveType == FbxAnimationCurveNodeType.Rotation)
-			nodeName = "AnimCurveNode::R";
-		else if( animCurveType == FbxAnimationCurveNodeType.Scale)
-			nodeName = "AnimCurveNode::S";
-		else if( animCurveType == FbxAnimationCurveNodeType.Visibility)
-			nodeName = "AnimCurveNode::Visibility";
+			curveTypeStr = "T";
+		else if (animCurveType == FbxAnimationCurveNodeType.Rotation)
+			curveTypeStr = "R";
+		else if (animCurveType == FbxAnimationCurveNodeType.Scale)
+			curveTypeStr = "S";
+		else if (animCurveType == FbxAnimationCurveNodeType.Visibility)
+			curveTypeStr = "Visibility";
 		
-		FbxObjectNode obj = new FbxObjectNode ("AnimationCurveNode", inputId, nodeName, "");
+		string nodeData = inputId + ", \"AnimCurveNode::" + curveTypeStr + "\", \"\"";
 
-		string pName = "Properties70";
-		string pData = " {\n";
-		pData += "\t\t\tP: \"d|X\", \"Number\", \"\", \"A\"," + initData.x.ToString () + "\n";
-		pData += "\t\t\tP: \"d|Y\", \"Number\", \"\", \"A\"," + initData.y.ToString () + "\n";
-		pData += "\t\t\tP: \"d|Z\", \"Number\", \"\", \"A\"," + initData.z.ToString () + "\n";
-		pData += "\t\t}\n";
+		FbxDataNode animCurveNode = new FbxDataNode (nodeName, nodeData, 1);
 
-		obj.AddSubnode (pName, pData);
+		FbxDataNode propertiesNode = new FbxDataNode ("Properties70", "", 2);
+		propertiesNode.addSubNode (new FbxDataNode ("P", "\"d|X\", \"Number\", \"\", \"A\"," + initData.x, 3));
+		propertiesNode.addSubNode (new FbxDataNode ("P", "\"d|Y\", \"Number\", \"\", \"A\"," + initData.y, 3));
+		propertiesNode.addSubNode (new FbxDataNode ("P", "\"d|Z\", \"Number\", \"\", \"A\"," + initData.z, 3));
 
-		objNodes.Add (obj);
+		animCurveNode.addSubNode (propertiesNode);
+
+		// release memory
+		animCurveNode.saveDataOnDisk(saveFileFolder);
+
+		objMainNode.addSubNode (animCurveNode);
 	}
 
-	public void AddAnimationCurve (string inputId, float[] curveData) {
-		FbxObjectNode obj = new FbxObjectNode ("AnimationCurve", inputId, "AnimCurve::", "");
-
+	public void AddAnimationCurve (string inputId, float[] curveData)
+	{
 		// prepare some data
-		string[] timeArray = new string[curveData.Length];
-		int[] keyAttrFlagDatas = new int[curveData.Length];
+		string keyValueFloatDataStr = "";
+		string timeArrayDataStr = "";
 
-		for (int i = 0; i < timeArray.Length; i++) {
-			timeArray [i] = FbxHelper.getFbxSeconds(i, 60);
-			keyAttrFlagDatas [i] = 24840;
+		for (int i = 0; i < curveData.Length; i++) {
+			if (i == 0) {
+				keyValueFloatDataStr += curveData [i].ToString ();
+				timeArrayDataStr += FbxHelper.getFbxSeconds (i, 60);
+			} else {
+				keyValueFloatDataStr += "," + curveData [i].ToString ();
+				timeArrayDataStr += "," + FbxHelper.getFbxSeconds (i, 60);
+			}
 		}
 
-		// add properties
-		obj.AddSubnode ("Default", "0");
-		obj.AddSubnode ("KeyVer", "4008");
-		obj.AddSubnode ("KeyTime", timeArray);
-		obj.AddSubnode ("KeyValueFloat", curveData);
-		obj.AddSubnode (";KeyAttrFlags", "Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive");
-		obj.AddSubnode ("KeyAttrFlags", new int[]{24840});
-		//obj.AddSubnode (";KeyAttrDataFloat", "RightAuto:0, NextLeftAuto:61.3648; RightAuto:0, NextLeftAuto:0; RightAuto:0, NextLeftAuto:0");
-		obj.AddSubnode ("KeyAttrRefCount", new int[]{timeArray.Length});
+		//AnimationCurve: 106102887970656, "AnimCurve::", "" 
+		string nodeData = inputId + ", \"AnimCurve::\", \"\"";
+		FbxDataNode curveNode = new FbxDataNode ("AnimationCurve", nodeData, 1);
 
-		objNodes.Add (obj);
+		string dataLengthStr = curveData.Length.ToString ();
+
+		curveNode.addSubNode ("Default", "0");
+		curveNode.addSubNode ("KeyVer", "4008");
+
+		FbxDataNode keyTimeNode = new FbxDataNode ("KeyTime", "*" + dataLengthStr, 2);
+		keyTimeNode.addSubNode ("a", timeArrayDataStr);
+		curveNode.addSubNode (keyTimeNode);
+
+		FbxDataNode keyValuesNode = new FbxDataNode ("KeyValueFloat", "*" + dataLengthStr, 2);
+		keyValuesNode.addSubNode ("a", keyValueFloatDataStr);
+		curveNode.addSubNode (keyValuesNode);
+
+		curveNode.addSubNode (";KeyAttrFlags", "Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive");
+
+		FbxDataNode keyAttrFlagsNode = new FbxDataNode ("KeyAttrFlags", "*1", 2);
+		keyAttrFlagsNode.addSubNode ("a", "24840");
+		curveNode.addSubNode (keyAttrFlagsNode);
+
+		FbxDataNode keyRefCountNode = new FbxDataNode ("KeyAttrRefCount", "*1", 2);
+		keyRefCountNode.addSubNode ("a", dataLengthStr);
+		curveNode.addSubNode (keyRefCountNode);
+
+		// release memory
+		curveNode.saveDataOnDisk(saveFileFolder);
+
+		objMainNode.addSubNode (curveNode);
 	}
 }
 
-public enum FbxAnimationCurveNodeType {
+public enum FbxAnimationCurveNodeType
+{
 	Translation,
 	Rotation,
 	Scale,

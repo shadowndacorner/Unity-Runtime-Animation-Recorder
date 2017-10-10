@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/*
+ * Thanks for Christian Tucker from Unity Answers
+ * http://answers.unity3d.com/questions/890835/biginteger-in-unity3d.html
+ * 
+ */
 namespace ScottGarland
 {
 	using DType = System.UInt32; // This could be UInt32, UInt16 or Byte; not UInt64.

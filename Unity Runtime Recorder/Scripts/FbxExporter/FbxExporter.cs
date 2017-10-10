@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Text.RegularExpressions;
 
 public class FbxExporter : MonoBehaviour
 {
 
 	public string sourceFilePath;
+	public string exportFileFolder;
 	public string exportFilePath;
 
 	FbxObjectsManager fbxObj;
@@ -174,11 +176,54 @@ public class FbxExporter : MonoBehaviour
 	IEnumerator ExportToFile ()
 	{
 
-		// copy Data into New Data
-		File.Copy (sourceFilePath, exportFilePath, true);
+		Debug.Log ("copy file ...");
+
+		// copy Data into New Data, and clear preRotations
+		StreamWriter writer = new StreamWriter(exportFilePath);
+		StreamReader reader = new StreamReader (sourceFilePath);
+
+		while (reader.Peek () != -1) {
+			string strLine = reader.ReadLine ();
+
+			// find prerotation
+			if (strLine.IndexOf ("PreRotation") != -1) {
+
+				// find tabs before 
+				int tabNum = strLine.IndexOf ("P:") + 1;
+				string tabStr = "";
+
+				for (int i = 0; i < tabNum; i++)
+					tabStr += "\t";
+
+				// just simply replace whole line, since every attribute looks the same
+				writer.WriteLine (tabStr + "P: \"PreRotation\", \"Vector3D\", \"Vector\", \"\",0,0,0");
+			} else
+				writer.WriteLine (strLine);
+		}
+		writer.Close ();
+		reader.Close ();
+
+		yield return null;
+
+
+
+
+
+		Debug.Log ("fetch nodes ...");
+
+
+		FbxDataNode[] allNodes = FbxDataNode.FetchNodes (File.ReadAllText (exportFilePath), 0);
+		int objNodeIndex = 0;
+
+		for (int i = 0; i < allNodes.Length; i++) {
+			if (allNodes [i].nodeName == "Objects")
+				objNodeIndex = i;
+		}
+
+		yield return null;
 
 		// setup converter
-		fbxObj = new FbxObjectsManager ();
+		fbxObj = new FbxObjectsManager (allNodes[objNodeIndex], exportFileFolder);
 		fbxConn = new FbxConnectionsManager (File.ReadAllText (exportFilePath));
 
 		string animBaseLayerId = fbxConn.getAnimBaseLayerId ();
@@ -223,8 +268,8 @@ public class FbxExporter : MonoBehaviour
 			 */
 
 			// create Animation Curve Nodes
-			fbxObj.AddAnimationCurveNode (animCurveNodeT_id, FbxAnimationCurveNodeType.Translation, observeTargets [i].localPosition);
-			fbxObj.AddAnimationCurveNode (animCurveNodeR_id, FbxAnimationCurveNodeType.Rotation, observeTargets [i].localRotation.eulerAngles);
+			fbxObj.AddAnimationCurveNode (animCurveNodeT_id, FbxAnimationCurveNodeType.Translation,ExportHelper.UnityToMayaPosition(observeTargets [i].localPosition));
+			fbxObj.AddAnimationCurveNode (animCurveNodeR_id, FbxAnimationCurveNodeType.Rotation,ExportHelper.UnityToMayaRotation(observeTargets [i].localRotation));
 			fbxObj.AddAnimationCurveNode (animCurveNodeS_id, FbxAnimationCurveNodeType.Scale, observeTargets [i].localScale);
 
 			float[] xData = new float[objTracker.posDataList.Count];
@@ -308,6 +353,8 @@ public class FbxExporter : MonoBehaviour
 		yield return null;
 
 
+		// clear data
+		fbxObj.objMainNode.clearSavedData();
 
 		Debug.Log ("End Exporting");
 	}

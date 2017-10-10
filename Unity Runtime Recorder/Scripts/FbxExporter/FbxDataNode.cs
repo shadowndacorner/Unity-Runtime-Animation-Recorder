@@ -47,6 +47,7 @@ public class FbxDataNode
 				}
 
 				FbxDataNode newNode = new FbxDataNode (nodeData [0], nodeData [1], level);
+				newNode.hasSubNode = true;
 				FbxDataNode[] subNodes = FbxDataNode.FetchNodes (contentInsideBracket, level + 1);
 
 				for (int i = 0; i < subNodes.Length; i++)
@@ -64,7 +65,11 @@ public class FbxDataNode
 			}
 			// found nothing, just skip
 			else {
-				;
+				// some data might be last data's
+				if (level > 1) {
+					int lastIndex = nodes.Count;
+					nodes [lastIndex - 1].nodeData += strLine;
+				}
 			}
 		}
 
@@ -77,9 +82,9 @@ public class FbxDataNode
 		string searchPattern = "";
 
 		if (strLine.IndexOf ("{") != -1) {
-			searchPattern = "([^:]*):([^\\{]*)\\{";
+			searchPattern = "([^:]*):\\s([^\\{]*)\\{";
 		} else {
-			searchPattern = "([^:]*):([^\\n]*)\\n";
+			searchPattern = "([^:]*):\\s([^\\n]*)\\n";
 			strLine += "\n";
 		}
 		Match matchData = Regex.Match (strLine, searchPattern);
@@ -91,11 +96,23 @@ public class FbxDataNode
 
 			// clear \t
 			resultData [0] = resultData [0].Replace ("\t", "");
+
+			// clear spaces
+			if (resultData [1] [resultData[1].Length - 1] == ' ')
+				resultData [1] = resultData [1].Substring (0, resultData [1].Length - 1);
+			
 		} else {
 			Debug.Log ("ERROR :: Cant Get Node Data");
 		}
 
 		return resultData;
+	}
+
+	public static int nowDataId = 0;
+
+	public static int GetNextDataId ()
+	{
+		return FbxDataNode.nowDataId++;
 	}
 
 
@@ -105,14 +122,12 @@ public class FbxDataNode
 	int level = 0;
 
 	public List<FbxDataNode> subNodes;
-	bool hasSubNode {
-		get{
-			if (subNodes.Count > 0)
-				return true;
-			else
-				return false;
-		}
-	}
+
+	// for file store
+	string dataFilePath = "";
+	bool isDataInFile = false;
+
+	public bool hasSubNode = false;
 
 	// create new data
 	public FbxDataNode (string nodeName, string nodeData, int level)
@@ -123,33 +138,74 @@ public class FbxDataNode
 		this.level = level;
 	}
 
+	public void addSubNode (string newNodeName, string newNodeData)
+	{
+		FbxDataNode newSubNode = new FbxDataNode (newNodeName, newNodeData, level + 1);
+		subNodes.Add (newSubNode);
+		hasSubNode = true;
+	}
+
 	public void addSubNode (FbxDataNode newNode)
 	{
 		subNodes.Add (newNode);
+		hasSubNode = true;
 	}
 
 	public string getResultData ()
 	{
 		string resultString = "";
 		string levelBlanks = "";
-
+		
 		for (int i = 0; i < level; i++)
 			levelBlanks += "\t";
 
 		resultString += levelBlanks + nodeName + ": " + nodeData;
 
+		// if still some subnodes
 		if (hasSubNode) {
 			resultString += " {\n";
 
+			// if data stored, load data
+			if (isDataInFile)
+				resultString += File.ReadAllText (dataFilePath);
+
+			// load other subNode datas
 			for (int i = 0; i < subNodes.Count; i++) {
 				resultString += subNodes [i].getResultData ();
 			}
 
 			resultString += levelBlanks + "}\n";
 		} else {
-			resultString += levelBlanks + "\n";
+			resultString += "\n";
 		}
 
 		return resultString;
+	}
+
+	public void saveDataOnDisk (string saveFolder)
+	{
+		if (!isDataInFile) {
+			isDataInFile = true;
+			dataFilePath = saveFolder + nodeName + "-Data-" + FbxDataNode.GetNextDataId ().ToString ();
+
+			if (File.Exists (dataFilePath))
+				File.Delete (dataFilePath);
+		}
+
+		StreamWriter writer = new StreamWriter (dataFilePath, true);
+		for (int i = 0; i < subNodes.Count; i++) {
+			writer.Write (subNodes [i].getResultData ());
+		}
+
+		subNodes.Clear ();
+		writer.Close ();
+	}
+
+	public void clearSavedData () {
+		if (isDataInFile)
+			File.Delete (dataFilePath);
+
+		for (int i = 0; i < subNodes.Count; i++)
+			subNodes [i].clearSavedData ();
 	}
 }
