@@ -11,9 +11,9 @@ public class MayaNodeDataContainer {
 	string saveFileName;	// replace '/' with '-', or would cause errors
 	string fileFolderPath;
 
-	public bool recordTranslation = false;
-	public bool recordRotation = false;
-	public bool recordScale = false;
+	bool recordTranslation = false;
+	bool recordRotation = false;
+	bool recordScale = false;
 
 	string objFinalFilePath = "";
 
@@ -24,6 +24,9 @@ public class MayaNodeDataContainer {
 		observeObj = inputObj;
 		fileFolderPath = inputPath;
 
+		recordTranslation = recordT;
+		recordRotation = recordR;
+		recordScale = recordS;
 
 		// setup tracker
 		tracker = new TransformTracker (inputObj, recordT, recordR, recordS);
@@ -45,89 +48,94 @@ public class MayaNodeDataContainer {
 
 
 		// write positions
-		dataWriterX.Write(getMayaCurveHeadContent ("animCurveTL", "translateX", tracker.posDataList.Count) );
-		dataWriterY.Write(getMayaCurveHeadContent ("animCurveTL", "translateY", tracker.posDataList.Count) );
-		dataWriterZ.Write(getMayaCurveHeadContent ("animCurveTL", "translateZ", tracker.posDataList.Count) );
+		if (recordTranslation) {
+			dataWriterX.Write (getMayaCurveHeadContent ("animCurveTL", "translateX", tracker.posDataList.Count));
+			dataWriterY.Write (getMayaCurveHeadContent ("animCurveTL", "translateY", tracker.posDataList.Count));
+			dataWriterZ.Write (getMayaCurveHeadContent ("animCurveTL", "translateZ", tracker.posDataList.Count));
 
-		Vector3 mayaPos = Vector3.zero;
+			Vector3 mayaPos = Vector3.zero;
 
-		// write datas
-		for (int i = 0; i < tracker.posDataList.Count; i++) {
-			mayaPos = ExportHelper.UnityToMayaPosition (tracker.posDataList [i]);
+			// write datas
+			for (int i = 0; i < tracker.posDataList.Count; i++) {
+				mayaPos = ExportHelper.UnityToMayaPosition (tracker.posDataList [i]);
 
-			dataWriterX.Write (" " + i + " " + mayaPos.x);
-			dataWriterY.Write (" " + i + " " + mayaPos.y);
-			dataWriterZ.Write (" " + i + " " + mayaPos.z);
+				dataWriterX.Write (" " + i + " " + mayaPos.x);
+				dataWriterY.Write (" " + i + " " + mayaPos.y);
+				dataWriterZ.Write (" " + i + " " + mayaPos.z);
+			}
+
+			// end file data
+			dataWriterX.Write (";\n");
+			dataWriterY.Write (";\n");
+			dataWriterZ.Write (";\n");
+
+			// write ending content
+			dataWriterX.Write (getMayaCurveFootContent ("translateX", "tx"));
+			dataWriterY.Write (getMayaCurveFootContent ("translateY", "ty"));
+			dataWriterZ.Write (getMayaCurveFootContent ("translateZ", "tz"));
 		}
-
-		// end file data
-		dataWriterX.Write(";\n");
-		dataWriterY.Write(";\n");
-		dataWriterZ.Write(";\n");
-
-		// write ending content
-		dataWriterX.Write (getMayaCurveFootContent ("translateX", "tx"));
-		dataWriterY.Write (getMayaCurveFootContent ("translateY", "ty"));
-		dataWriterZ.Write (getMayaCurveFootContent ("translateZ", "tz"));
-
 
 
 
 		// write rotations
-		dataWriterX.Write(getMayaCurveHeadContent ("animCurveTA", "rotateX", tracker.rotDataList.Count) );
-		dataWriterY.Write(getMayaCurveHeadContent ("animCurveTA", "rotateY", tracker.rotDataList.Count) );
-		dataWriterZ.Write(getMayaCurveHeadContent ("animCurveTA", "rotateZ", tracker.rotDataList.Count) );
+		if (recordRotation) {
+			
+			dataWriterX.Write (getMayaCurveHeadContent ("animCurveTA", "rotateX", tracker.rotDataList.Count));
+			dataWriterY.Write (getMayaCurveHeadContent ("animCurveTA", "rotateY", tracker.rotDataList.Count));
+			dataWriterZ.Write (getMayaCurveHeadContent ("animCurveTA", "rotateZ", tracker.rotDataList.Count));
 
-		Vector3 mayaRot = Vector3.zero;
+			Vector3 mayaRot = Vector3.zero;
 
-		// write datas
-		for (int i = 0; i < tracker.rotDataList.Count; i++) {
-			mayaRot = ExportHelper.UnityToMayaRotation (tracker.rotDataList [i]);
+			// write datas
+			for (int i = 0; i < tracker.rotDataList.Count; i++) {
+				mayaRot = ExportHelper.UnityToMayaRotation (tracker.rotDataList [i]);
 
-			dataWriterX.Write (" " + i + " " + mayaRot.x);
-			dataWriterY.Write (" " + i + " " + mayaRot.y);
-			dataWriterZ.Write (" " + i + " " + mayaRot.z);
+				dataWriterX.Write (" " + i + " " + mayaRot.x);
+				dataWriterY.Write (" " + i + " " + mayaRot.y);
+				dataWriterZ.Write (" " + i + " " + mayaRot.z);
+			}
+
+			// end file data
+			dataWriterX.Write (";\n");
+			dataWriterY.Write (";\n");
+			dataWriterZ.Write (";\n");
+
+			// write ending content
+			dataWriterX.Write (getMayaCurveFootContent ("rotateX", "rx"));
+			dataWriterY.Write (getMayaCurveFootContent ("rotateY", "ry"));
+			dataWriterZ.Write (getMayaCurveFootContent ("rotateZ", "rz"));
 		}
-
-		// end file data
-		dataWriterX.Write(";\n");
-		dataWriterY.Write(";\n");
-		dataWriterZ.Write(";\n");
-
-		// write ending content
-		dataWriterX.Write (getMayaCurveFootContent ("rotateX", "rx"));
-		dataWriterY.Write (getMayaCurveFootContent ("rotateY", "ry"));
-		dataWriterZ.Write (getMayaCurveFootContent ("rotateZ", "rz"));
-
 
 
 
 		// write scales
-		dataWriterX.Write(getMayaCurveHeadContent ("animCurveTU", "scaleX", tracker.scaleDataList.Count) );
-		dataWriterY.Write(getMayaCurveHeadContent ("animCurveTU", "scaleY", tracker.scaleDataList.Count) );
-		dataWriterZ.Write(getMayaCurveHeadContent ("animCurveTU", "scaleZ", tracker.scaleDataList.Count) );
+		if (recordScale) {
+			
+			dataWriterX.Write (getMayaCurveHeadContent ("animCurveTU", "scaleX", tracker.scaleDataList.Count));
+			dataWriterY.Write (getMayaCurveHeadContent ("animCurveTU", "scaleY", tracker.scaleDataList.Count));
+			dataWriterZ.Write (getMayaCurveHeadContent ("animCurveTU", "scaleZ", tracker.scaleDataList.Count));
 
-		Vector3 mayaScale = Vector3.zero;
+			Vector3 mayaScale = Vector3.zero;
 
-		// write datas
-		for (int i = 0; i < tracker.rotDataList.Count; i++) {
-			mayaScale = tracker.scaleDataList [i];
+			// write datas
+			for (int i = 0; i < tracker.rotDataList.Count; i++) {
+				mayaScale = tracker.scaleDataList [i];
 
-			dataWriterX.Write (" " + i + " " + mayaScale.x);
-			dataWriterY.Write (" " + i + " " + mayaScale.y);
-			dataWriterZ.Write (" " + i + " " + mayaScale.z);
+				dataWriterX.Write (" " + i + " " + mayaScale.x);
+				dataWriterY.Write (" " + i + " " + mayaScale.y);
+				dataWriterZ.Write (" " + i + " " + mayaScale.z);
+			}
+
+			// end file data
+			dataWriterX.Write (";\n");
+			dataWriterY.Write (";\n");
+			dataWriterZ.Write (";\n");
+
+			// write ending content
+			dataWriterX.Write (getMayaCurveFootContent ("scaleX", "sx"));
+			dataWriterY.Write (getMayaCurveFootContent ("scaleY", "sy"));
+			dataWriterZ.Write (getMayaCurveFootContent ("scaleZ", "sz"));
 		}
-
-		// end file data
-		dataWriterX.Write(";\n");
-		dataWriterY.Write(";\n");
-		dataWriterZ.Write(";\n");
-
-		// write ending content
-		dataWriterX.Write (getMayaCurveFootContent ("scaleX", "sx"));
-		dataWriterY.Write (getMayaCurveFootContent ("scaleY", "sy"));
-		dataWriterZ.Write (getMayaCurveFootContent ("scaleZ", "sz"));
-
 
 
 

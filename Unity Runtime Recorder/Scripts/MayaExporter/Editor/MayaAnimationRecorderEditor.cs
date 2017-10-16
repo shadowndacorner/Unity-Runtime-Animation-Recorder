@@ -81,8 +81,8 @@ public class MayaAnimationRecorderEditor : Editor {
 		// record setting
 		EditorGUILayout.LabelField( "== Record Setting ==" );
 		recordPosition.boolValue = EditorGUILayout.Toggle ("Record Position", recordPosition.boolValue);
-		recordRotation.boolValue = EditorGUILayout.Toggle ("Record Position", recordRotation.boolValue);
-		recordScale.boolValue = EditorGUILayout.Toggle ("Record Position", recordScale.boolValue);
+		recordRotation.boolValue = EditorGUILayout.Toggle ("Record Rotation", recordRotation.boolValue);
+		recordScale.boolValue = EditorGUILayout.Toggle ("Record Scale", recordScale.boolValue);
 
 		EditorGUILayout.Space ();
 
