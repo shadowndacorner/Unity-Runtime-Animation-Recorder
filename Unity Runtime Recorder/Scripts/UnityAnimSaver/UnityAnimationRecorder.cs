@@ -100,17 +100,21 @@ public class UnityAnimationRecorder : MonoBehaviour {
 
 		if (isStart) {
 
-			if (frameIndex < recordFrames) {
-				for (int i = 0; i < objRecorders.Length; i++) {
-					objRecorders [i].AddFrame (nowTime);
-				}
+			if (recordLimitedFrames) {
+				if (frameIndex < recordFrames) {
+					for (int i = 0; i < objRecorders.Length; i++) {
+						objRecorders [i].AddFrame (nowTime);
+					}
 
-				++frameIndex;
-			} else {
-				isStart = false;
-				ExportAnimationClip ();
-				CustomDebug ("Recording Finish, generating .anim file");
+					++frameIndex;
+				}
+				else {
+					isStart = false;
+					ExportAnimationClip ();
+					CustomDebug ("Recording Finish, generating .anim file");
+				}
 			}
+
 		}
 	}
 
