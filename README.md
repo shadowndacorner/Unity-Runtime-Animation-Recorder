@@ -48,6 +48,14 @@
   2017-10-10 Implemented FBX exporter, works similar as Maya Exporter.  
   But for now, there is some memory issue, can't export too complex objects.  
     
+  [Export to FBX Demo Video](https://www.youtube.com/watch?v=Hy2U0UYp6cA)
+  
+  Here are a few things to notice:
+  
+  1. The "source FBX file" has to be in ASCII format (you can choose ASCII or Binary while exporting FBX file)
+  2. Make sure every nodes' name are exactly the same as the source file  
+  (sometimes nodes' name got changed by Unity or 3D software)
+  
 
 ## Dealing with Lag
 
