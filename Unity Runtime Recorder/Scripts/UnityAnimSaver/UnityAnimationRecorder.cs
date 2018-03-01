@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UnityAnimationRecorder : MonoBehaviour {
 
@@ -27,8 +28,13 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	public float timeScaleOnStart = 0.0f;
 	public float timeScaleOnRecord = 1.0f;
 
+	public bool recordBlendShape = false;
+
+
 	Transform[] recordObjs;
+	SkinnedMeshRenderer[] blendShapeObjs;
 	UnityObjectAnimation[] objRecorders;
+	List<UnityBlendShapeAnimation> blendShapeRecorders;
 
 	bool isStart = false;
 	float nowTime = 0.0f;
@@ -42,6 +48,7 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	void SetupRecorders () {
 		recordObjs = gameObject.GetComponentsInChildren<Transform> ();
 		objRecorders = new UnityObjectAnimation[recordObjs.Length];
+		blendShapeRecorders = new List<UnityBlendShapeAnimation> ();
 
 		frameIndex = 0;
 		nowTime = 0.0f;
@@ -49,6 +56,18 @@ public class UnityAnimationRecorder : MonoBehaviour {
 		for (int i = 0; i < recordObjs.Length; i++) {
 			string path = AnimationRecorderHelper.GetTransformPathName (transform, recordObjs [i]);
 			objRecorders [i] = new UnityObjectAnimation ( path, recordObjs [i]);
+
+			// check if theres blendShape
+			if (recordBlendShape) {
+				if (recordObjs [i].GetComponent<SkinnedMeshRenderer> ()) {
+					SkinnedMeshRenderer tempSkinMeshRenderer = recordObjs [i].GetComponent<SkinnedMeshRenderer> ();
+
+					// there is blendShape exist
+					if (tempSkinMeshRenderer.sharedMesh.blendShapeCount > 0) {
+						blendShapeRecorders.Add (new UnityBlendShapeAnimation (path, tempSkinMeshRenderer));
+					}
+				}
+			}
 		}
 
 		if (changeTimeScale)
@@ -71,6 +90,12 @@ public class UnityAnimationRecorder : MonoBehaviour {
 
 			for (int i = 0; i < objRecorders.Length; i++) {
 				objRecorders [i].AddFrame (nowTime);
+			}
+
+			if (recordBlendShape) {
+				for (int i = 0; i < blendShapeRecorders.Count; i++) {
+					blendShapeRecorders [i].AddFrame (nowTime);
+				}
 			}
 		}
 
@@ -142,6 +167,18 @@ public class UnityAnimationRecorder : MonoBehaviour {
 
 			for (int x = 0; x < curves.Length; x++) {
 				clip.SetCurve (objRecorders [i].pathName, typeof(Transform), curves [x].propertyName, curves [x].animCurve);
+			}
+		}
+
+		if (recordBlendShape) {
+			for (int i = 0; i < blendShapeRecorders.Count; i++) {
+
+				UnityCurveContainer[] curves = blendShapeRecorders [i].curves;
+
+				for (int x = 0; x < curves.Length; x++) {
+					clip.SetCurve (blendShapeRecorders [i].pathName, typeof(SkinnedMeshRenderer), curves [x].propertyName, curves [x].animCurve);
+				}
+				
 			}
 		}
 

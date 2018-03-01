@@ -16,6 +16,7 @@ public class UnityAnimationRecorderEditor : Editor {
 	SerializedProperty showLogGUI;
 	SerializedProperty recordLimitedFrames;
 	SerializedProperty recordFrames;
+	SerializedProperty recordBlendShape;
 
 	SerializedProperty changeTimeScale;
 	SerializedProperty timeScaleOnStart;
@@ -33,6 +34,7 @@ public class UnityAnimationRecorderEditor : Editor {
 		showLogGUI = serializedObject.FindProperty ("showLogGUI");
 		recordLimitedFrames = serializedObject.FindProperty ("recordLimitedFrames");
 		recordFrames = serializedObject.FindProperty ("recordFrames");
+		recordBlendShape = serializedObject.FindProperty ("recordBlendShape");
 
 		changeTimeScale = serializedObject.FindProperty ("changeTimeScale");
 		timeScaleOnStart = serializedObject.FindProperty ("timeScaleOnStart");
@@ -70,6 +72,7 @@ public class UnityAnimationRecorderEditor : Editor {
 
 		// Other Settings
 		EditorGUILayout.LabelField( "== Other Settings ==" );
+		recordBlendShape.boolValue = EditorGUILayout.Toggle ("Record BlendShapes", recordBlendShape.boolValue);
 		bool timeScaleOption = EditorGUILayout.Toggle ( "Change Time Scale", changeTimeScale.boolValue);
 		changeTimeScale.boolValue = timeScaleOption;
 
