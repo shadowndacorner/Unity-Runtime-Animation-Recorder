@@ -20,6 +20,7 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	public bool showLogGUI = false;
 	string logMessage = "";
 
+    public bool recordOnStart = false;
 	public bool recordLimitedFrames = false;
 	public int recordFrames = 1000;
 	int frameIndex = 0;
@@ -42,7 +43,8 @@ public class UnityAnimationRecorder : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		SetupRecorders ();
-
+        if (recordOnStart)
+            StartRecording();
 	}
 
 	void SetupRecorders () {
