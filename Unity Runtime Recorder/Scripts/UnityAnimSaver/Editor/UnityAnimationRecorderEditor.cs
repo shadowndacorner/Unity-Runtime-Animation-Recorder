@@ -23,26 +23,31 @@ public class UnityAnimationRecorderEditor : Editor {
 	SerializedProperty timeScaleOnStart;
 	SerializedProperty timeScaleOnRecord;
 
+	SerializedProperty limitFramerate;
+	SerializedProperty targetFramerate;
+	SerializedProperty recordScale;
 
-	void OnEnable () {
+    void OnEnable() {
+        savePath = serializedObject.FindProperty("savePath");
+        fileName = serializedObject.FindProperty("fileName");
 
-		savePath = serializedObject.FindProperty ("savePath");
-		fileName = serializedObject.FindProperty ("fileName");
+        startRecordKey = serializedObject.FindProperty("startRecordKey");
+        stopRecordKey = serializedObject.FindProperty("stopRecordKey");
 
-		startRecordKey = serializedObject.FindProperty ("startRecordKey");
-		stopRecordKey = serializedObject.FindProperty ("stopRecordKey");
+        showLogGUI = serializedObject.FindProperty("showLogGUI");
+        recordLimitedFrames = serializedObject.FindProperty("recordLimitedFrames");
+        recordFrames = serializedObject.FindProperty("recordFrames");
+        recordBlendShape = serializedObject.FindProperty("recordBlendShape");
+        recordOnStart = serializedObject.FindProperty("recordOnStart");
 
-		showLogGUI = serializedObject.FindProperty ("showLogGUI");
-		recordLimitedFrames = serializedObject.FindProperty ("recordLimitedFrames");
-		recordFrames = serializedObject.FindProperty ("recordFrames");
-		recordBlendShape = serializedObject.FindProperty ("recordBlendShape");
-        recordOnStart = serializedObject.FindProperty ("recordOnStart");
+        changeTimeScale = serializedObject.FindProperty("changeTimeScale");
+        timeScaleOnStart = serializedObject.FindProperty("timeScaleOnStart");
+        timeScaleOnRecord = serializedObject.FindProperty("timeScaleOnRecord");
 
-		changeTimeScale = serializedObject.FindProperty ("changeTimeScale");
-		timeScaleOnStart = serializedObject.FindProperty ("timeScaleOnStart");
-		timeScaleOnRecord = serializedObject.FindProperty ("timeScaleOnRecord");
-	
-	}
+        limitFramerate = serializedObject.FindProperty("limitFramerate");
+        targetFramerate = serializedObject.FindProperty("targetFramerate");
+        recordScale = serializedObject.FindProperty("recordScale");
+    }
 
 	public override void OnInspectorGUI () {
 		serializedObject.Update ();
@@ -71,6 +76,19 @@ public class UnityAnimationRecorderEditor : Editor {
 		EditorGUILayout.PropertyField (stopRecordKey);
 
 		EditorGUILayout.Space ();
+
+		EditorGUILayout.LabelField( "== Recording Settings ==" );
+        limitFramerate.boolValue = EditorGUILayout.Toggle ("Limit Framerate", limitFramerate.boolValue);
+        if (limitFramerate.boolValue)
+        {
+            targetFramerate.floatValue = EditorGUILayout.FloatField("Limit Framerate", targetFramerate.floatValue);
+            targetFramerate.floatValue = Mathf.Max(targetFramerate.floatValue, 1.0f);
+        }
+
+        recordScale.boolValue = EditorGUILayout.Toggle ("Record Scale", recordScale.boolValue);
+
+        
+        EditorGUILayout.Space ();
 
 		// Other Settings
 		EditorGUILayout.LabelField( "== Other Settings ==" );
