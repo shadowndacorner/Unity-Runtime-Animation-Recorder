@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 public class FbxConnectionsManager {
 
 	string fbxStrData = "";
-	string originalConnectionData = "";
+	//string originalConnectionData = "";
 	List<FbxConnectionObj> connObjs;
 
 	public FbxConnectionsManager (string inputData) {

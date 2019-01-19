@@ -12,9 +12,9 @@ public class FbxDataNode
 
 		StringReader reader = new StringReader (inputData);
 
-		bool foundBracket = false;
+		//bool foundBracket = false;
 
-		string[] tempNodeData = new string[2];
+		//string[] tempNodeData = new string[2];
 
 		while (reader.Peek () != -1) {
 			
